@@ -12,6 +12,8 @@ import AlertAssignTicketModal from "./alert-assign-ticket-modal";
 import AlertNoteModal from "./alert-note-modal";
 import { useProviders } from "utils/hooks/useProviders";
 import { AlertDto } from "./models";
+import { AlertMethodModal } from "./alert-method-modal";
+import AlertRunWorkflowModal from "./alert-run-workflow-modal";
 
 const defaultPresets: Preset[] = [
   { name: "Feed", options: [] },
@@ -21,12 +23,8 @@ const defaultPresets: Preset[] = [
 
 export default function Alerts() {
   const { useAllAlertsWithSubscription } = useAlerts();
-  // get providers
-  // providers doesnt change often so we can use a longer deduping interval
-  const { data: providersData = { installed_providers: [] } } = useProviders({
-    dedupingInterval: 10000,
-    revalidateOnMount: false,
-  });
+
+  const { data: providersData = { installed_providers: [] } } = useProviders();
 
   const ticketingProviders = useMemo(
     () =>
@@ -38,6 +36,8 @@ export default function Alerts() {
   // hooks for the note and ticket modals
   const [noteModalAlert, setNoteModalAlert] = useState<AlertDto | null>();
   const [ticketModalAlert, setTicketModalAlert] = useState<AlertDto | null>();
+  const [runWorkflowModalAlert, setRunWorkflowModalAlert] =
+    useState<AlertDto | null>();
 
   const { useAllPresets, getCurrentPreset } = usePresets();
   const pathname = usePathname();
@@ -93,6 +93,7 @@ export default function Alerts() {
               isAsyncLoading={isAsyncLoading}
               setTicketModalAlert={setTicketModalAlert}
               setNoteModalAlert={setNoteModalAlert}
+              setRunWorkflowModalAlert={setRunWorkflowModalAlert}
             />
           ))}
         </TabPanels>
@@ -105,6 +106,11 @@ export default function Alerts() {
         <AlertNoteModal
           handleClose={() => setNoteModalAlert(null)}
           alert={noteModalAlert ?? null}
+        />
+        <AlertMethodModal />
+        <AlertRunWorkflowModal
+          alert={runWorkflowModalAlert}
+          handleClose={() => setRunWorkflowModalAlert(null)}
         />
       </TabGroup>
     </Card>
